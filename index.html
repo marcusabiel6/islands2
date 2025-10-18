@@ -20,14 +20,12 @@
 <body>
 <h1>islands (multiplayer soon!!)</h1>
 <table id="board"></table>
-<p id="status">current player: red | leaps - red: 0, blue: 0 | red islands: 0 | blue islands: 0</p>
+<p id="status">current player: red | red islands: 0 | blue islands: 0</p>
 
-<!-- JS code stays the same -->
 <script>
 const size = 6;
 let board = Array(size).fill(null).map(() => Array(size).fill(''));
 let currentPlayer = 'red';
-let leaps = { red: 0, blue: 0 };
 
 const table = document.getElementById('board');
 
@@ -50,10 +48,12 @@ function countIslands(player) {
 }
 
 function isValidMove(i,j) {
-  if (board[i][j] === currentPlayer) return false;
-  if (leaps[currentPlayer] > 0 && board[i][j] !== currentPlayer) return true;
   if (board[i][j] !== '') return false;
+
+  // First move: anywhere
   if (!board.flat().some(x => x === currentPlayer)) return true;
+
+  // Must be adjacent to your existing squares
   const dirs = [[0,1],[1,0],[0,-1],[-1,0]];
   return dirs.some(([di,dj]) => {
     let ni = i + di, nj = j + dj;
@@ -63,10 +63,10 @@ function isValidMove(i,j) {
 
 function makeMove(i,j) {
   if (!isValidMove(i,j)) return;
-  if (board[i][j] !== '' && board[i][j] !== currentPlayer) leaps[currentPlayer]--;
+
   board[i][j] = currentPlayer;
-  if (countIslands(currentPlayer) >= 10 && leaps[currentPlayer] === 0) leaps[currentPlayer] = 1;
   currentPlayer = currentPlayer === 'red' ? 'blue' : 'red';
+
   createBoard();
   checkEndGame();
 }
@@ -75,7 +75,7 @@ function updateStatus() {
   const redCount = countIslands('red');
   const blueCount = countIslands('blue');
   document.getElementById('status').textContent = 
-    `current player: ${currentPlayer} | leaps - red: ${leaps.red}, blue: ${leaps.blue} | red islands: ${redCount} | blue islands: ${blueCount}`;
+    `current player: ${currentPlayer} | red islands: ${redCount} | blue islands: ${blueCount}`;
 }
 
 function checkEndGame() {
@@ -97,3 +97,4 @@ createBoard();
 </script>
 </body>
 </html>
+
