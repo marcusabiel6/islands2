@@ -1,26 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>islands (multiplayer soon!!)</title>
-<style>
-  body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
-  table { border-collapse: collapse; }
-  td {
-    width: 60px; height: 60px;
-    border: 1px solid black;
-    text-align: center;
-    font-size: 24px;
-    cursor: pointer;
-  }
-  td.red { background-color: lightcoral; }
-  td.blue { background-color: lightblue; }
-</style>
-</head>
-<body>
 <h1>islands (multiplayer soon!!)</h1>
 <table id="board"></table>
 <p id="status">current player: red | red islands: 0 | blue islands: 0</p>
+<button id="retryBtn">retry</button> <!-- new retry button -->
 
 <script>
 const size = 6;
@@ -28,6 +9,7 @@ let board = Array(size).fill(null).map(() => Array(size).fill(''));
 let currentPlayer = 'red';
 
 const table = document.getElementById('board');
+const retryBtn = document.getElementById('retryBtn');
 
 function createBoard() {
   table.innerHTML = '';
@@ -49,11 +31,7 @@ function countIslands(player) {
 
 function isValidMove(i,j) {
   if (board[i][j] !== '') return false;
-
-  // First move: anywhere
-  if (!board.flat().some(x => x === currentPlayer)) return true;
-
-  // Must be adjacent to your existing squares
+  if (!board.flat().some(x => x === currentPlayer)) return true; // first move anywhere
   const dirs = [[0,1],[1,0],[0,-1],[-1,0]];
   return dirs.some(([di,dj]) => {
     let ni = i + di, nj = j + dj;
@@ -63,10 +41,8 @@ function isValidMove(i,j) {
 
 function makeMove(i,j) {
   if (!isValidMove(i,j)) return;
-
   board[i][j] = currentPlayer;
   currentPlayer = currentPlayer === 'red' ? 'blue' : 'red';
-
   createBoard();
   checkEndGame();
 }
@@ -93,8 +69,12 @@ function checkEndGame() {
   }
 }
 
+// **retry button resets the game**
+retryBtn.addEventListener('click', () => {
+  board = Array(size).fill(null).map(() => Array(size).fill(''));
+  currentPlayer = 'red';
+  createBoard();
+});
+
 createBoard();
 </script>
-</body>
-</html>
-
